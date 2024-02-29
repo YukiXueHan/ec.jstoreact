@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function handleClick(elmt) {
+  if (elmt.classList.contains('selected')) {
+    elmt.className = 'box'
+  } else {
+    elmt.className = 'box selected'
+  }
 }
 
-export default App
+function App() {
+  useEffect(() => {
+    const boxes = document.querySelectorAll('.box');
+
+    boxes.forEach((box, index) => {
+      box.addEventListener('click', () => {
+        handleClick(box);
+
+        const rowIndex = Math.floor(index / 3);
+        const colIndex = index % 3;
+        const adjacentIndices = [
+          [rowIndex - 1, colIndex], // Up
+          [rowIndex + 1, colIndex], // Down
+          [rowIndex, colIndex - 1], // Left
+          [rowIndex, colIndex + 1], // Right
+        ];
+
+        adjacentIndices.forEach((indices) => {
+          const [row, col] = indices;
+          const adjIndex = row * 3 + col;
+          if (row >= 0 && row < 3 && col >= 0 && col < 3) {
+            handleClick(boxes[adjIndex]);
+          }
+        });
+      });
+    });
+  }, []);
+
+  return (
+    <div className="container">
+      {[...Array(9)].map((_, index) => (
+        <div key={index} className="box"></div>
+      ))}
+    </div>
+  );
+}
+
+export default App;
